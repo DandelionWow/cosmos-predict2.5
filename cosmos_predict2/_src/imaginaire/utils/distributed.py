@@ -194,6 +194,7 @@ def parallel_model_wrapper(config_ddp: DDPConfig, model: torch.nn.Module) -> tor
             find_unused_parameters=config_ddp.find_unused_parameters,
             static_graph=config_ddp.static_graph,
             broadcast_buffers=config_ddp.broadcast_buffers,
+            gradient_as_bucket_view=config_ddp.gradient_as_bucket_view,
             process_group=ddp_group,
         )
     return model

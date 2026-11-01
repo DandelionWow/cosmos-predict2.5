@@ -49,6 +49,25 @@ FSDP_CONFIG = dict(
 )
 
 # rectified flow model
+DDP_RECTIFIED_FLOW_CONFIG = dict(
+    trainer=dict(
+        distributed_parallelism="ddp",
+        ddp=dict(
+            static_graph=False,
+            find_unused_parameters=True,
+            broadcast_buffers=False,
+            gradient_as_bucket_view=True,
+        ),
+    ),
+    model=L(ActionVideo2WorldModelRectifiedFlow)(
+        config=Video2WorldModelRectifiedFlowConfig(
+            fsdp_shard_size=1,
+            state_t=24,
+        ),
+        _recursive_=False,
+    ),
+)
+
 FSDP_RECTIFIED_FLOW_CONFIG = dict(
     trainer=dict(
         distributed_parallelism="fsdp",
@@ -67,6 +86,12 @@ def register_model():
     cs = ConfigStore.instance()
     cs.store(group="model", package="_global_", name="action_conditioned_video2world_ddp", node=DDP_CONFIG)
     cs.store(group="model", package="_global_", name="action_conditioned_video2world_fsdp", node=FSDP_CONFIG)
+    cs.store(
+        group="model",
+        package="_global_",
+        name="action_conditioned_video2world_ddp_rectified_flow",
+        node=DDP_RECTIFIED_FLOW_CONFIG,
+    )
     cs.store(
         group="model",
         package="_global_",

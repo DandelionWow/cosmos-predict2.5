@@ -267,9 +267,9 @@ class Text2WorldModelRectifiedFlow(ImaginaireModel):
                 s = config.ema.rate
                 self.ema_exp_coefficient = np.roots([1, 7, 16 - s**-2, 12 - s**-2]).real.max()
 
-                # Only copy if both models are on the same device (not CPU)
-                if not keep_on_cpu:
-                    self.net_ema_worker.copy_to(src_model=self.net, tgt_model=self.net_ema)
+                # Initialize EMA from the net even when materialized on CPU.
+                # Checkpoint loading may replace both models afterwards.
+                self.net_ema_worker.copy_to(src_model=self.net, tgt_model=self.net_ema)
         torch.cuda.empty_cache()
 
     def apply_fsdp(self, dp_mesh: DeviceMesh) -> None:

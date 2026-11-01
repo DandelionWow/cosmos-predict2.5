@@ -233,6 +233,8 @@ class DDPConfig:
     static_graph: bool = True
     # Set to True if we want to synchronize buffers. Set to False if the sync is going to be handled elsewhere.
     broadcast_buffers: bool = True
+    # Share gradient storage with DDP communication buckets.
+    gradient_as_bucket_view: bool = False
 
 
 @make_freezable

@@ -396,5 +396,12 @@ def create_model_from_consolidated_checkpoint_with_fsdp(config: Config) -> Imagi
             raise AttributeError(
                 "Model does not implement 'apply_fsdp'. Please implement this method to enable FSDP after consolidated checkpoint loading."
             )
+    elif config.trainer.distributed_parallelism == "ddp" and model.config.ema.enabled:
+        # Match apply_fsdp(): a fresh training EMA starts from the loaded net,
+        # not the random model used while materializing a net-only checkpoint.
+        model.net_ema_worker.copy_to(src_model=model.net, tgt_model=model.net_ema)
+        source_buffers = dict(model.net.named_buffers())
+        for name, target_buffer in model.net_ema.named_buffers():
+            target_buffer.copy_(source_buffers[name])
 
     return model
