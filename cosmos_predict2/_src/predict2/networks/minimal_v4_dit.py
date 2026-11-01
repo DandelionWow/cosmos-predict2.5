@@ -1801,7 +1801,7 @@ class MiniTrainDIT(WeightTrainingStat):
 
         return x_B_C_Tt_Hp_Wp
 
-    def enable_selective_checkpoint(self, sac_config: SACConfig, blocks: nn.ModuleList):
+    def enable_selective_checkpoint(self, sac_config: SACConfig, blocks: nn.ModuleList, preserve_rng_state: bool = False):
         if sac_config.mode == CheckpointMode.NONE:
             return self
 
@@ -1815,7 +1815,7 @@ class MiniTrainDIT(WeightTrainingStat):
                 block = ptd_checkpoint_wrapper(
                     block,
                     context_fn=_context_fn,
-                    preserve_rng_state=False,
+                    preserve_rng_state=preserve_rng_state,
                 )
                 blocks.register_module(block_id, block)
         self.register_module(
@@ -1823,7 +1823,7 @@ class MiniTrainDIT(WeightTrainingStat):
             ptd_checkpoint_wrapper(
                 self.final_layer,
                 context_fn=_context_fn,
-                preserve_rng_state=False,
+                preserve_rng_state=preserve_rng_state,
             ),
         )
 
