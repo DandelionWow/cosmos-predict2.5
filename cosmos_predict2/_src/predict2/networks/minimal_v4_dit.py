@@ -1377,8 +1377,12 @@ class Block(nn.Module):
             scale_mlp_B_T_1_1_D,
             shift_mlp_B_T_1_1_D,
         )
+        if hasattr(self, "event_condition"):
+            self.mlp.set_condition(emb_B_T_D, *self.event_condition)
         result_B_T_H_W_D = self.mlp(normalized_x_B_T_H_W_D)
         x_B_T_H_W_D = x_B_T_H_W_D + gate_mlp_B_T_1_1_D * result_B_T_H_W_D
+        if hasattr(self, "event_adapter"):
+            x_B_T_H_W_D = self.event_adapter(x_B_T_H_W_D, emb_B_T_D, *self.event_condition)
         return x_B_T_H_W_D
 
 
