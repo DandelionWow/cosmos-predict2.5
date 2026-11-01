@@ -81,6 +81,11 @@ FSDP_RECTIFIED_FLOW_CONFIG = dict(
     ),
 )
 
+SINGLE_RECTIFIED_FLOW_CONFIG = dict(
+    trainer=dict(distributed_parallelism="single"),
+    model=DDP_RECTIFIED_FLOW_CONFIG["model"],
+)
+
 
 def register_model():
     cs = ConfigStore.instance()
@@ -91,6 +96,12 @@ def register_model():
         package="_global_",
         name="action_conditioned_video2world_ddp_rectified_flow",
         node=DDP_RECTIFIED_FLOW_CONFIG,
+    )
+    cs.store(
+        group="model",
+        package="_global_",
+        name="action_conditioned_video2world_single_rectified_flow",
+        node=SINGLE_RECTIFIED_FLOW_CONFIG,
     )
     cs.store(
         group="model",

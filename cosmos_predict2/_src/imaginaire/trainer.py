@@ -214,6 +214,8 @@ class ImaginaireTrainer:
             dataloader_train (torch.utils.data.DataLoader): The training data loader.
             dataloader_val (torch.utils.data.DataLoader): The validation data loader.
         """
+        if self.config.trainer.distributed_parallelism == "single" and distributed.get_world_size() != 1:
+            raise ValueError("Single-device training requires world_size=1")
         # Leaving this for backward compability for now, but we can think about moving this to model.on_train_start for all models.
         model = model.to("cuda", memory_format=self.config.trainer.memory_format)  # type: ignore
         model.on_train_start(self.config.trainer.memory_format)
@@ -230,7 +232,7 @@ class ImaginaireTrainer:
         if self.config.trainer.distributed_parallelism == "ddp":
             # Create a DDP model wrapper.
             model_ddp = distributed.parallel_model_wrapper(self.config.trainer.ddp, model)
-        elif self.config.trainer.distributed_parallelism == "fsdp":
+        elif self.config.trainer.distributed_parallelism in ("fsdp", "single"):
             model_ddp = model
         else:
             raise ValueError(f"Unknown distributed parallelism mode: {self.config.trainer.distributed_parallelism}")
